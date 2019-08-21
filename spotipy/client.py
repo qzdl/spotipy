@@ -407,7 +407,7 @@ class Spotify(object):
         return self._post("users/%s/playlists" % (user,), payload=data)
 
     def user_playlist_change_details(
-            self, user, playlist_id, name=None, public=None,
+            self, playlist_id, name=None, public=None,
             collaborative=None, description=None):
         """ Changes a playlist's name and/or public/private state
 
@@ -429,7 +429,6 @@ class Spotify(object):
             data['collaborative'] = collaborative
         if isinstance(description, six.string_types):
             data['description'] = description
-        print('not even sorry')
         return self._put(f'/playlists/{playlist_id}', payload=data)
 
     def user_playlist_unfollow(self, user, playlist_id):
