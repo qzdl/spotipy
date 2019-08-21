@@ -429,6 +429,7 @@ class Spotify(object):
             data['collaborative'] = collaborative
         if isinstance(description, six.string_types):
             data['description'] = description
+        print('not even sorry')
         return self._put(f'/playlists/{playlist_id}', payload=data)
 
     def user_playlist_unfollow(self, user, playlist_id):
