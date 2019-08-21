@@ -351,13 +351,6 @@ class Spotify(object):
         """
         return self._get('users/' + user)
 
-    def current_user_playlists(self, limit=50, offset=0):
-        """ Get current user playlists without required getting his profile
-            Parameters:
-                - limit  - the number of items to return
-                - offset - the index of the first item to return
-        """
-        return self._get("me/playlists", limit=limit, offset=offset)
 
     def user_playlists(self, user, limit=50, offset=0):
         """ Gets playlists of a user
@@ -399,7 +392,6 @@ class Spotify(object):
                          limit=limit, offset=offset, fields=fields,
                          market=market)
 
-
     def user_playlist_create(self, user, name, public=True, description=''):
         """ Creates a playlist for a user
 
@@ -437,8 +429,7 @@ class Spotify(object):
             data['collaborative'] = collaborative
         if isinstance(description, six.string_types):
             data['description'] = description
-        return self._put("users/%s/playlists/%s" % (user, playlist_id),
-                         payload=data)
+        return self._put(f'/playlists/{playlist_id}', payload=data)
 
     def user_playlist_unfollow(self, user, playlist_id):
         """ Unfollows (deletes) a playlist for a user
@@ -569,6 +560,41 @@ class Spotify(object):
         """
         return self._get("users/{}/playlists/{}/followers/contains?ids={}".format(playlist_owner_id, playlist_id, ','.join(user_ids)))
 
+
+    def user_follow_artists(self, ids=[]):
+        ''' Follow one or more artists
+            Parameters:
+                - ids - a list of artist IDs
+        '''
+        return self._put('me/following?type=artist&ids=' + ','.join(ids))
+
+    def user_follow_users(self, ids=[]):
+        ''' Follow one or more users
+            Parameters:
+                - ids - a list of user IDs
+        '''
+        return self._put('me/following?type=user&ids=' + ','.join(ids))
+
+
+    def current_playback(self, market = None):
+        ''' Get information about user's current playback.
+
+            Parameters:
+                - market - an ISO 3166-1 alpha-2 country code.
+            An alias for the 'current_user_playback' method.
+        '''
+        return self._get("me/player", market = market)
+
+    def currently_playing(self, market = None):
+        ''' Get user's currently playing track.
+
+            Parameters:
+                - market - an ISO 3166-1 alpha-2 country code.
+            An alias for 'current_user_playing_track'
+        '''
+        return self._get("me/player/currently-playing", market = market)
+
+
     def me(self):
         """ Get detailed profile information about the current user.
             An alias for the 'current_user' method.
@@ -581,10 +607,28 @@ class Spotify(object):
         """
         return self.me()
 
-    def current_user_playing_track(self):
-        ''' Get information about the current users currently playing track.
+    def current_user_playback(self, market=None):
+        ''' Get information about user's current playback.
+
+            Parameters:
+                - market - an ISO 3166-1 alpha-2 country code.
+            An alias for the 'current_playback' method.
         '''
-        return self._get('me/player/currently-playing')
+        return self._get("me/player", market = market)
+
+    def current_user_playing_track(self, market=None):
+        ''' Get information about the current users currently playing track.
+            An alias for 'current_user_playing_track'
+        '''
+        return self._get('me/player/currently-playing', market=None)
+
+    def current_user_playlists(self, limit=50, offset=0):
+        """ Get current user playlists without required getting his profile
+            Parameters:
+                - limit  - the number of items to return
+                - offset - the index of the first item to return
+        """
+        return self._get("me/playlists", limit=limit, offset=offset)
 
     def current_user_saved_albums(self, limit=20, offset=0):
         """ Gets a list of the albums saved in the current authorized user's
@@ -686,7 +730,7 @@ class Spotify(object):
 
             Parameters:
                 - limit - the number of entities to return
-        '''        
+        '''
         return self._get('me/player/recently-played', limit=limit)
 
     def current_user_saved_albums_add(self, albums=[]):
@@ -699,19 +743,7 @@ class Spotify(object):
         r = self._put('me/albums?ids=' + ','.join(alist))
         return r
 
-    def user_follow_artists(self, ids=[]):
-        ''' Follow one or more artists
-            Parameters:
-                - ids - a list of artist IDs
-        '''
-        return self._put('me/following?type=artist&ids=' + ','.join(ids))
 
-    def user_follow_users(self, ids=[]):
-        ''' Follow one or more users
-            Parameters:
-                - ids - a list of user IDs
-        '''
-        return self._put('me/following?type=user&ids=' + ','.join(ids))
 
     def featured_playlists(self, locale=None, country=None, timestamp=None,
                            limit=20, offset=0):
@@ -882,21 +914,6 @@ class Spotify(object):
         '''
         return self._get("me/player/devices")
 
-    def current_playback(self, market = None):
-        ''' Get information about user's current playback.
-
-            Parameters:
-                - market - an ISO 3166-1 alpha-2 country code.
-        '''
-        return self._get("me/player", market = market)
-
-    def currently_playing(self, market = None):
-        ''' Get user's currently playing track.
-
-            Parameters:
-                - market - an ISO 3166-1 alpha-2 country code.
-        '''
-        return self._get("me/player/currently-playing", market = market)
 
     def transfer_playback(self, device_id, force_play = True):
         ''' Transfer playback to another device.
